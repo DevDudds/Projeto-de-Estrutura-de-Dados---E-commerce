@@ -1,5 +1,11 @@
 #include <stdio.h>
 
+struct Cliente {
+    char nome[50];
+    char cpf[12];
+    int idade;
+};
+
 int main(){
 
     int opcao;
