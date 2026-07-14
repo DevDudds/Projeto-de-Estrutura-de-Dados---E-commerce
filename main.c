@@ -12,7 +12,7 @@ int main(){
 
     do {
         printf("\nDigite uma opção");
-        printf("\n\t1 - Inserir\n\t2 - Remover\n\t3 - Listar\n\t4 - Sair\n");
+        printf("\n\t1 - Inserir\n\t2 - Buscar Cliente por CPF Remover\n\t3 - Listar\n\t4 - Sair\n");
         scanf("%d", &opcao);
 
         switch(opcao){
