@@ -45,7 +45,7 @@ NoCliente *buscarCliente(NoCliente *raiz, char *cpf, int *indice_encontrado)
     }
     
     // aqui se i for menor que o numero de chaves, e o cpf for igual ao que procuramos, nos usamos o *indice_encontrado = i; para apontar pra ele
-    if ( i < raiz ->num_chaves && strcmp(cpf,raiz->clientes->cpf[i] == 0)){
+    if ( i < raiz ->num_chaves && strcmp(cpf,raiz->clientes[i].cpf == 0)){
         *indice_encontrado = i;
         return raiz; // aqui retornamos a raiz, pois achamos na raiz
     }
