@@ -152,14 +152,14 @@ int main()
     do
     {
         printf("\nDigite uma opção");
-        printf("\n\t1 - Inserir\n\t2 - Buscar Cliente por CPF Remover\n\t3 - Listar\n\t4 - Sair\n");
+        printf("\n\t1 - Inserir\n\t2 - Buscar Cliente por CPF \n\t3 - Listar\n\t4 - Sair\n");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
             Cliente cliente;
-
+            printf("\n--- INSERIR CLIENTE ---\n");
             printf("Nome: ");
             scanf(" %[^\n]", cliente.nome);
 
@@ -177,6 +177,26 @@ int main()
 
             break;
         case 2:
+            char cpf_digitado[15];
+            int indice = -1;
+
+            printf("\n--- BUSCAR CLIENTE POR CPF ---\n");
+            printf("Digite o CPF do cliente: ");
+            scanf("%s",cpf_digitado);
+
+            NoCliente *no_encontrado = buscarCliente(raiz, cpf_digitado, &indice);
+
+            if (no_encontrado !=NULL && indice != -1){
+                Cliente cliente = no_encontrado->clientes[indice];
+
+                printf("\n--- Cliente encontrado ---\n");
+                printf("Nome: %s\n", cliente.nome);
+                printf("CPF: %s\n", cliente.cpf);
+
+            } else {
+
+                printf("\n Cliente com o CPF [%s] não foi encontrado", cpf_digitado);
+            }
 
             break;
         case 3:
