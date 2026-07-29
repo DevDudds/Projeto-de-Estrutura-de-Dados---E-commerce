@@ -3,11 +3,13 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define MAX_CLIENTES 2 // eduardo e erik, nossa árvore é de ordem 3, ou seja, duas chaves pois é sempre N-1
-#define MAX_FILHOS 3   // e três filhos, pois é sempre total de chaves + 1
+#define T 2
+
+#define MAX_CLIENTES (T * 2 - 1) // nossa árvore é de ordem 3, ou seja, duas chaves pois é sempre N-1
+#define MAX_FILHOS (2 * T)   // e três filhos, pois é sempre total de chaves + 1
 
 typedef struct Cliente
-{                  // eduardo e erik, aprendi que se a gente colocar 'typedef', evitamos de por struct
+{                  // aprendi que se a gente colocar 'typedef', evitamos de por struct
     char nome[50]; // isso fala para o c++ que agora o Cliente é um tipo, como int, double, e tals.
     char cpf[12];  // isso evita colocar sempre "Struct Cliente, e colocamos somente "Cliente"."
     int idade;
@@ -21,7 +23,7 @@ typedef struct NoCliente
     bool eh_folha;
 } NoCliente;
 
-NoCliente *NoVzio(bool eh_folha)
+NoCliente *NoVazio(bool eh_folha)
 {
     NoCliente *novoCliente = (NoCliente *)malloc(sizeof(NoCliente));
     novoCliente->num_chaves = 0;
@@ -58,10 +60,94 @@ NoCliente *buscarCliente(NoCliente *raiz, char *cpf, int *indice_encontrado)
     return buscarCliente(raiz->filhos[i], cpf, indice_encontrado);
 }
 
+void dividirFilho(NoCliente *pai, int indice) {
+    NoCliente *filho = pai->filhos[indice];
+    NoCliente *novo = NoVazio(filho->eh_folha);
+
+    for (int i = 0; i < T - 1; i++) {
+        novo->clientes[i] = filho->clientes[i + T];
+    }
+
+    novo->num_chaves = T - 1;
+
+    if (!filho->eh_folha) {
+        for (int i = 0; i < T; i++) {
+            novo->filhos[i] = filho->filhos[i + T];
+        }
+    }
+
+    filho->num_chaves = T - 1;
+
+    for (int i = pai->num_chaves; i>= indice + 1; i--) {
+        pai->filhos[i + 1] = pai->filhos[i];
+    }
+
+    pai->filhos[indice + 1] = novo;
+
+    for (int i = pai->num_chaves - 1; i>= indice; i--) {
+        pai->clientes[i + 1] = pai->clientes[i];
+    }
+
+    pai->clientes[indice] = filho->clientes[T - 1];
+
+    pai->num_chaves++;
+}
+
+void inserirNaoCheio(NoCliente *no, Cliente cliente) {
+    int c = no->num_chaves - 1;
+    if (no->eh_folha) {
+        while(c >= 0 && strcmp(cliente.cpf, no->clientes[c].cpf) < 0) {
+            no->clientes[c + 1] = no->clientes[c];
+            c--;
+        }
+
+        no->clientes[c+1] = cliente;
+        no->num_chaves++;
+    } else {
+        while(c >= 0 && strcmp(cliente.cpf, no->clientes[c].cpf) < 0) {
+            c--;
+        }
+        c++;
+        if (no->filhos[c]->num_chaves == MAX_CLIENTES) {
+            dividirFilho(no, c);
+            if (strcmp(cliente.cpf, no->clientes[c].cpf) > 0) {
+                c++;
+            }
+            inserirNaoCheio(no->filhos[c], cliente);
+        }
+    }
+}
+
+void inserir(NoCliente **raiz, Cliente cliente) {
+    if((*raiz)->num_chaves == MAX_CLIENTES) {
+        NoCliente *novaRaiz = NoVazio(false);
+        novaRaiz->filhos[0] = *raiz;
+        dividirFilho(novaRaiz, 0);
+        *raiz = novaRaiz;
+        inserirNaoCheio(novaRaiz, cliente);
+    } else {
+        inserirNaoCheio(*raiz, cliente);
+    }
+}
+
+void imprimirNo(NoCliente *no)
+{
+    printf("[ ");
+
+    for (int i = 0; i < no->num_chaves; i++)
+    {
+        printf("%s ", no->clientes[i].cpf);
+    }
+
+    printf("]\n");
+}
+
 int main()
 {
 
     int opcao;
+
+    NoCliente *raiz = NoVazio(true);
 
     do
     {
@@ -72,6 +158,22 @@ int main()
         switch (opcao)
         {
         case 1:
+            Cliente cliente;
+
+            printf("Nome: ");
+            scanf(" %[^\n]", cliente.nome);
+
+            printf("CPF: ");
+            scanf("%11s", cliente.cpf);
+
+            printf("Idade: ");
+            scanf("%d", &cliente.idade);
+
+            inserir(&raiz, cliente);
+
+            imprimirNo(raiz);
+
+            printf("\nCliente inserido!\n");
 
             break;
         case 2:
