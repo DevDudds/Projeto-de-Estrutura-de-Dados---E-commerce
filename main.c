@@ -130,6 +130,79 @@ void inserir(NoCliente **raiz, Cliente cliente) {
     }
 }
 
+// Escreve uma string no arquivo já "escapando" aspas e barras invertidas,
+// pra não gerar um JSON inválido caso o nome tenha algum caractere especial.
+void escreverStringJSON(FILE *f, char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (str[i] == '"' || str[i] == '\\')
+        {
+            fputc('\\', f);
+        }
+        fputc(str[i], f);
+    }
+}
+
+// Escreve um único cliente como um objeto JSON, ex: {"nome": "...", "cpf": "...", "idade": 30}
+void escreverClienteJSON(FILE *f, Cliente cliente)
+{
+    fprintf(f, "  {\"nome\": \"");
+    escreverStringJSON(f, cliente.nome);
+    fprintf(f, "\", \"cpf\": \"");
+    escreverStringJSON(f, cliente.cpf);
+    fprintf(f, "\", \"idade\": %d}", cliente.idade);
+}
+
+// Percorre a árvore B em ordem (in-order), que é a forma de visitar
+// todos os clientes na ordem correta (por CPF), e vai escrevendo cada um no arquivo.
+// 'primeiro' controla se colocamos vírgula antes do próximo elemento ou não.
+void percorrerEmOrdemJSON(FILE *f, NoCliente *no, bool *primeiro)
+{
+    if (no == NULL)
+        return;
+
+    for (int i = 0; i < no->num_chaves; i++)
+    {
+        if (!no->eh_folha)
+        {
+            percorrerEmOrdemJSON(f, no->filhos[i], primeiro);
+        }
+
+        if (!*primeiro)
+        {
+            fprintf(f, ",\n");
+        }
+        escreverClienteJSON(f, no->clientes[i]);
+        *primeiro = false;
+    }
+
+    if (!no->eh_folha)
+    {
+        percorrerEmOrdemJSON(f, no->filhos[no->num_chaves], primeiro);
+    }
+}
+
+// Reescreve o arquivo clientes.json inteiro com todos os clientes da árvore.
+void salvarClientesJSON(NoCliente *raiz, const char *nomeArquivo)
+{
+    FILE *f = fopen(nomeArquivo, "w");
+    if (f == NULL)
+    {
+        printf("\nErro ao abrir o arquivo '%s' para salvar os dados!\n", nomeArquivo);
+        return;
+    }
+
+    fprintf(f, "[\n");
+
+    bool primeiro = true;
+    percorrerEmOrdemJSON(f, raiz, &primeiro);
+
+    fprintf(f, "\n]\n");
+
+    fclose(f);
+}
+
 void imprimirNo(NoCliente *no)
 {
     printf("[ ");
@@ -229,6 +302,7 @@ int main()
 
             break;
         case 4:
+            salvarClientesJSON(raiz, "clientes.json");
             return 0;
             break;
         default:
