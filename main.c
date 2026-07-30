@@ -5,13 +5,13 @@
 
 #define T 2
 
-#define MAX_CLIENTES (T * 2 - 1) // nossa árvore é de ordem 3, ou seja, duas chaves pois é sempre N-1
-#define MAX_FILHOS (2 * T)   // e três filhos, pois é sempre total de chaves + 1
+#define MAX_CLIENTES (T * 2 - 1)  
+#define MAX_FILHOS (2 * T)   
 
 typedef struct Cliente
-{                  // aprendi que se a gente colocar 'typedef', evitamos de por struct
-    char nome[50]; // isso fala para o c++ que agora o Cliente é um tipo, como int, double, e tals.
-    char cpf[12];  // isso evita colocar sempre "Struct Cliente, e colocamos somente "Cliente"."
+{                  
+    char nome[50]; 
+    char cpf[12];  
     int idade;
 } Cliente;
 
@@ -38,25 +38,24 @@ NoCliente *NoVazio(bool eh_folha)
 NoCliente *buscarCliente(NoCliente *raiz, char *cpf, int *indice_encontrado)
 {
     if (raiz == NULL)
-        return NULL; // vê se a "caixinha" existe, se não, retorna null
+        return NULL; 
 
-    int i = 0; // esse i serve para "andar" procurando na aŕvore.
+    int i = 0; 
 
-    while (i < raiz->num_chaves && strcmp(cpf, raiz->clientes[i].cpf) > 0){ // aqui faz que enquanto NÃO for maior que o número de chaves, e NÃO for o cpf desejado eu ando com i++
+    while (i < raiz->num_chaves && strcmp(cpf, raiz->clientes[i].cpf) > 0){ 
         i++;
     }
     
-    // aqui se i for menor que o numero de chaves, e o cpf for igual ao que procuramos, nos usamos o *indice_encontrado = i; para apontar pra ele
+   
     if ( i < raiz ->num_chaves && strcmp(cpf,raiz->clientes[i].cpf) == 0){
         *indice_encontrado = i;
-        return raiz; // aqui retornamos a raiz, pois achamos na raiz
+        return raiz;
     }
-   // aqui se raiz for folha, ou seja, nao tenha mais nada para procurar,é pq aquele cpf não existe
+   
     if (raiz->eh_folha){
         return NULL;
     }
     
-    // aqui se a raiz tiver filhos, ele vai nos filhos procurando indice por indice com o raiz ->[i]
     return buscarCliente(raiz->filhos[i], cpf, indice_encontrado);
 }
 
@@ -119,6 +118,14 @@ void inserirNaoCheio(NoCliente *no, Cliente cliente) {
 }
 
 void inserir(NoCliente **raiz, Cliente cliente) {
+
+    int indice = -1;
+
+    if (buscarCliente(*raiz, cliente.cpf, &indice) != NULL){
+        printf("Erro: CPF já cadastrado!\n");
+        return;
+    }
+
     if((*raiz)->num_chaves == MAX_CLIENTES) {
         NoCliente *novaRaiz = NoVazio(false);
         novaRaiz->filhos[0] = *raiz;
@@ -130,8 +137,6 @@ void inserir(NoCliente **raiz, Cliente cliente) {
     }
 }
 
-// Escreve uma string no arquivo já "escapando" aspas e barras invertidas,
-// pra não gerar um JSON inválido caso o nome tenha algum caractere especial.
 void escreverStringJSON(FILE *f, char *str)
 {
     for (int i = 0; str[i] != '\0'; i++)
@@ -144,7 +149,6 @@ void escreverStringJSON(FILE *f, char *str)
     }
 }
 
-// Escreve um único cliente como um objeto JSON, ex: {"nome": "...", "cpf": "...", "idade": 30}
 void escreverClienteJSON(FILE *f, Cliente cliente)
 {
     fprintf(f, "  {\"nome\": \"");
@@ -154,9 +158,6 @@ void escreverClienteJSON(FILE *f, Cliente cliente)
     fprintf(f, "\", \"idade\": %d}", cliente.idade);
 }
 
-// Percorre a árvore B em ordem (in-order), que é a forma de visitar
-// todos os clientes na ordem correta (por CPF), e vai escrevendo cada um no arquivo.
-// 'primeiro' controla se colocamos vírgula antes do próximo elemento ou não.
 void percorrerEmOrdemJSON(FILE *f, NoCliente *no, bool *primeiro)
 {
     if (no == NULL)
@@ -183,7 +184,6 @@ void percorrerEmOrdemJSON(FILE *f, NoCliente *no, bool *primeiro)
     }
 }
 
-// Reescreve o arquivo clientes.json inteiro com todos os clientes da árvore.
 void salvarClientesJSON(NoCliente *raiz, const char *nomeArquivo)
 {
     FILE *f = fopen(nomeArquivo, "w");
@@ -314,7 +314,7 @@ void remover(NoCliente *no, char *cpf) {
         } else {
             NoCliente *filho = no->filhos[i];
             if (filho->num_chaves == T - 1) {
-                //irmão da esquerda existe?
+                
                 if(i > 0 && no->filhos[i - 1]->num_chaves >= T) {
                     NoCliente *irmao = no->filhos[i - 1];
 
@@ -337,7 +337,7 @@ void remover(NoCliente *no, char *cpf) {
                     irmao->num_chaves--;
                     filho->num_chaves++;
                 } 
-                //senão, irmão da direita existe?
+
                 else if (i < no->num_chaves && no->filhos[i + 1]->num_chaves >= T) {
                     NoCliente *irmao = no->filhos[i + 1];
 
@@ -453,8 +453,6 @@ int main()
 
             inserir(&raiz, cliente);
 
-            printf("\nCliente inserido!\n");
-
             break;
         }
 
@@ -522,8 +520,6 @@ int main()
         case 5:
         {
             salvarClientesJSON(raiz, "clientes.json");
-
-            printf("\nDados salvos. Encerrando...\n");
 
             return 0;
         }
