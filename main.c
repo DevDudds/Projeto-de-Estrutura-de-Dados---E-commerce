@@ -219,7 +219,7 @@ void listarClientes(NoCliente *no){
     if (no == NULL) return;
 
     int i;
-    for (int i = 0; i < no->num_chaves; i++){
+    for ( i = 0; i < no->num_chaves; i++){
         if (!no->eh_folha){
             listarClientes(no->filhos[i]);
         }
@@ -228,10 +228,10 @@ void listarClientes(NoCliente *no){
                no->clientes[i].cpf,
                no->clientes[i].nome,
                no->clientes[i].idade);
-
+        }
+        
         if (!no->eh_folha){
             listarClientes(no->filhos[i]);
-        }
         }
 }
 
