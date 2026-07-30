@@ -28,7 +28,7 @@ NoCliente *NoVazio(bool eh_folha)
     NoCliente *novoCliente = (NoCliente *)malloc(sizeof(NoCliente));
     novoCliente->num_chaves = 0;
     novoCliente->eh_folha = eh_folha;
-    for (size_t i = 0; i < MAX_FILHOS; i++)
+    for (int i = 0; i < MAX_FILHOS; i++)
     {
         novoCliente->filhos[i] = NULL;
     }
@@ -142,6 +142,26 @@ void imprimirNo(NoCliente *no)
     printf("]\n");
 }
 
+void listarClientes(NoCliente *no){
+    if (no == NULL) return;
+
+    int i;
+    for (int i = 0; i < no->num_chaves; i++){
+        if (!no->eh_folha){
+            listarClientes(no->filhos[i]);
+        }
+
+        printf("CPF: %-12s | Nome %-20s | Idade: %d\n",
+               no->clientes[i].cpf,
+               no->clientes[i].nome,
+               no->clientes[i].idade);
+
+        if (!no->eh_folha){
+            listarClientes(no->filhos[i]);
+        }
+        }
+}
+
 int main()
 {
 
@@ -200,6 +220,12 @@ int main()
 
             break;
         case 3:
+            printf("\n--- LISTA DE CLIENTES (ORDENADOS POR CPF) ---\n");
+            if (raiz == NULL || raiz ->num_chaves == 0){
+                printf("Nenhum cliente cadastrado.");
+            }else{
+                listarClientes(raiz);
+            }
 
             break;
         case 4:
