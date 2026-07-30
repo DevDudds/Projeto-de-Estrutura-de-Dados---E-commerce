@@ -113,8 +113,8 @@ void inserirNaoCheio(NoCliente *no, Cliente cliente) {
             if (strcmp(cliente.cpf, no->clientes[c].cpf) > 0) {
                 c++;
             }
-            inserirNaoCheio(no->filhos[c], cliente);
         }
+        inserirNaoCheio(no->filhos[c], cliente);
     }
 }
 
