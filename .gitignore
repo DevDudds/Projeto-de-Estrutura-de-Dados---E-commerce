@@ -3,6 +3,7 @@
 *.obj
 *.exe
 *.out
+*.elf
 
 # Ignorar todos os arquivos JSON
 *.json

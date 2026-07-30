@@ -113,8 +113,8 @@ void inserirNaoCheio(NoCliente *no, Cliente cliente) {
             if (strcmp(cliente.cpf, no->clientes[c].cpf) > 0) {
                 c++;
             }
-            inserirNaoCheio(no->filhos[c], cliente);
         }
+        inserirNaoCheio(no->filhos[c], cliente);
     }
 }
 
@@ -235,184 +235,9 @@ void listarClientes(NoCliente *no){
         }
 }
 
-void remover(NoCliente *no, char *cpf) {
-    int i = 0;
-    while (i < no->num_chaves && strcmp(cpf, no->clientes[i].cpf) > 0) {
-        i++;
-    }
-
-    if (i < no->num_chaves && strcmp(cpf, no->clientes[i].cpf) == 0) {
-        if (no->eh_folha) {
-            for (int j = i; j < no->num_chaves - 1; j++) {
-                no->clientes[j] = no->clientes[j + 1];
-            }
-
-            no->num_chaves--;
-        } else {
-            if (no->filhos[i]->num_chaves >= T) {
-                NoCliente *atual = no->filhos[i];
-
-                while(!atual->eh_folha) {
-                    atual = atual->filhos[atual->num_chaves];
-                }
-
-                Cliente pred = atual->clientes[atual->num_chaves - 1];
-                no->clientes[i] = pred;
-                remover(no->filhos[i], pred.cpf);
-
-            } else if (no->filhos[i + 1]->num_chaves >= T) {
-                NoCliente *atual = no->filhos[i + 1];
-
-                while(!atual->eh_folha) {
-                    atual = atual->filhos[0];
-                }
-
-                Cliente sucessor = atual->clientes[0];
-                no->clientes[i] = sucessor;
-                remover(no->filhos[i + 1], sucessor.cpf);
-
-            } else {
-                NoCliente *esquerdo = no->filhos[i];
-                NoCliente *direito = no->filhos[i + 1];
-
-                int antigas = esquerdo->num_chaves;
-
-                esquerdo->clientes[antigas] = no->clientes[i];
-
-                for (int j = 0; j < direito->num_chaves; j++) {
-                    esquerdo->clientes[antigas + 1 + j] = direito->clientes[j];
-                }
-
-                esquerdo->num_chaves += direito->num_chaves + 1;
-
-                if (!esquerdo->eh_folha) {
-                    for (int j = 0; j <= direito->num_chaves; j++)
-                    {
-                        esquerdo->filhos[antigas + 1 + j] = direito->filhos[j];
-                    }
-                }
-
-                for (int j = i; j < no->num_chaves - 1; j++) {
-                    no->clientes[j] = no->clientes[j + 1];
-                }
-
-                for (int j = i + 1; j < no->num_chaves; j++) {
-                    no->filhos[j] = no->filhos[j + 1];
-                }
-
-                no->num_chaves--;
-
-                free(direito);
-
-                remover(esquerdo, cpf);
-            }
-        }
-    } else {
-        if(no->eh_folha) {
-            printf("Cliente não encontrado");
-            return;
-        } else {
-            NoCliente *filho = no->filhos[i];
-            if (filho->num_chaves == T - 1) {
-                //irmão da esquerda existe?
-                if(i > 0 && no->filhos[i - 1]->num_chaves >= T) {
-                    NoCliente *irmao = no->filhos[i - 1];
-
-                    for (int j = filho->num_chaves - 1; j >= 0; j--) {
-                        filho->clientes[j + 1] = filho->clientes[j];
-                    }
-
-                    if (!filho->eh_folha) {
-                        for (int j = filho->num_chaves; j >= 0; j--) {
-                            filho->filhos[j + 1] = filho->filhos[j];
-                        }
-                        filho->filhos[0] = irmao->filhos[irmao->num_chaves];
-
-                        irmao->filhos[irmao->num_chaves] = NULL;
-                    }
-
-                    filho->clientes[0] = no->clientes[i - 1];
-                    no->clientes[i - 1] = irmao->clientes[irmao->num_chaves - 1];
-                    
-                    irmao->num_chaves--;
-                    filho->num_chaves++;
-                } 
-                //senão, irmão da direita existe?
-                else if (i < no->num_chaves && no->filhos[i + 1]->num_chaves >= T) {
-                    NoCliente *irmao = no->filhos[i + 1];
-
-                    filho->clientes[filho->num_chaves] = no->clientes[i];
-
-                    if (!filho->eh_folha) {
-                        filho->filhos[filho->num_chaves + 1] = irmao->filhos[0];
-                    }
-
-                    no->clientes[i] = irmao->clientes[0];
-                    
-                    for (int j = 0; j < irmao->num_chaves - 1; j++) {
-                        irmao->clientes[j] = irmao->clientes[j + 1];
-                    }
-
-                    irmao->filhos[irmao->num_chaves] = NULL;
-
-                    if (!irmao->eh_folha) {
-                        for (int j = 0; j < irmao->num_chaves; j++) {
-                            irmao->filhos[j] = irmao->filhos[j + 1];
-                        }
-                    }
-
-                    irmao->num_chaves--;
-                    filho->num_chaves++;
-                } else {
-                    NoCliente *esquerdo = no->filhos[i];
-                    NoCliente *direito = no->filhos[i + 1];
-
-                    int antigas = esquerdo->num_chaves;
-
-                    esquerdo->clientes[antigas] = no->clientes[i];
-
-                    esquerdo->num_chaves += direito->num_chaves + 1;
-
-                    if(!esquerdo->eh_folha) {
-                        for(int j = 0; j <= direito->num_chaves; j++) {
-                            esquerdo->filhos[antigas + 1 + j] = direito->filhos[j];
-                        }
-                    }
-
-                    for (int j = i; j < no->num_chaves - 1; j++) {
-                        no->clientes[j] = no->clientes[j + 1];
-                    }
-                    
-                    for (int j = i + 1; j < no->num_chaves; j++) {
-                        no->filhos[j] = no->filhos[j + 1];
-                    }
-
-                    no->num_chaves--;
-                    free(direito);
-                    remover(esquerdo, cpf);
-                    return;
-                }
-            }
-
-            remover(filho, cpf);
-        }
-    }
-}
-
-void removerArvore(NoCliente **raiz, char *cpf)
-{
-    remover(*raiz, cpf);
-
-    if((*raiz)->num_chaves == 0 && !(*raiz)->eh_folha)
-    {
-        NoCliente *aux = *raiz;
-        *raiz = (*raiz)->filhos[0];
-        free(aux);
-    }
-}
-
 int main()
 {
+
     int opcao;
 
     NoCliente *raiz = NoVazio(true);
@@ -420,22 +245,14 @@ int main()
     do
     {
         printf("\nDigite uma opção");
-        printf("\n\t1 - Inserir");
-        printf("\n\t2 - Buscar Cliente por CPF");
-        printf("\n\t3 - Listar");
-        printf("\n\t4 - Remover Cliente");
-        printf("\n\t5 - Sair\n");
-
+        printf("\n\t1 - Inserir\n\t2 - Buscar Cliente por CPF \n\t3 - Listar\n\t4 - Sair\n");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
-        {
             Cliente cliente;
-
             printf("\n--- INSERIR CLIENTE ---\n");
-
             printf("Nome: ");
             scanf(" %[^\n]", cliente.nome);
 
@@ -447,85 +264,50 @@ int main()
 
             inserir(&raiz, cliente);
 
+            imprimirNo(raiz);
+
             printf("\nCliente inserido!\n");
 
             break;
-        }
-
         case 2:
-        {
             char cpf_digitado[15];
             int indice = -1;
 
             printf("\n--- BUSCAR CLIENTE POR CPF ---\n");
-
             printf("Digite o CPF do cliente: ");
-            scanf("%s", cpf_digitado);
+            scanf("%s",cpf_digitado);
 
             NoCliente *no_encontrado = buscarCliente(raiz, cpf_digitado, &indice);
 
-            if (no_encontrado != NULL && indice != -1)
-            {
+            if (no_encontrado !=NULL && indice != -1){
                 Cliente cliente = no_encontrado->clientes[indice];
 
                 printf("\n--- Cliente encontrado ---\n");
                 printf("Nome: %s\n", cliente.nome);
                 printf("CPF: %s\n", cliente.cpf);
-                printf("Idade: %d\n", cliente.idade);
-            }
-            else
-            {
-                printf("\nCliente com CPF [%s] não foi encontrado.\n", cpf_digitado);
+
+            } else {
+
+                printf("\n Cliente com o CPF [%s] não foi encontrado", cpf_digitado);
             }
 
             break;
-        }
-
         case 3:
-        {
             printf("\n--- LISTA DE CLIENTES (ORDENADOS POR CPF) ---\n");
-
-            if (raiz == NULL || raiz->num_chaves == 0)
-            {
-                printf("Nenhum cliente cadastrado.\n");
-            }
-            else
-            {
+            if (raiz == NULL || raiz ->num_chaves == 0){
+                printf("Nenhum cliente cadastrado.");
+            }else{
                 listarClientes(raiz);
             }
 
             break;
-        }
-
         case 4:
-        {
-            char cpf_remover[15];
-
-            printf("\n--- REMOVER CLIENTE ---\n");
-
-            printf("Digite o CPF do cliente: ");
-            scanf("%s", cpf_remover);
-
-            removerArvore(&raiz, cpf_remover);
-
-            printf("\nOperação de remoção concluída.\n");
-
-            break;
-        }
-
-        case 5:
-        {
             salvarClientesJSON(raiz, "clientes.json");
-
-            printf("\nDados salvos. Encerrando...\n");
-
             return 0;
-        }
-
+            break;
         default:
-            printf("\nOpção inválida!\n");
+            continue;
             break;
         }
-
-    } while (opcao != 5);
+    } while (opcao != 4);
 }
