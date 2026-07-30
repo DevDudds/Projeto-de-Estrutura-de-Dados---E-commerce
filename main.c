@@ -353,12 +353,12 @@ void remover(NoCliente *no, char *cpf) {
                         irmao->clientes[j] = irmao->clientes[j + 1];
                     }
 
-                    irmao->filhos[irmao->num_chaves] = NULL;
-
                     if (!irmao->eh_folha) {
                         for (int j = 0; j < irmao->num_chaves; j++) {
                             irmao->filhos[j] = irmao->filhos[j + 1];
                         }
+
+                        irmao->filhos[irmao->num_chaves] = NULL;
                     }
 
                     irmao->num_chaves--;
@@ -368,8 +368,14 @@ void remover(NoCliente *no, char *cpf) {
                     NoCliente *direito = no->filhos[i + 1];
 
                     int antigas = esquerdo->num_chaves;
+                    int chaves_direito = direito->num_chaves;
 
                     esquerdo->clientes[antigas] = no->clientes[i];
+
+                    for (int j = 0; j < chaves_direito; j++) {
+                        esquerdo->clientes[antigas + 1 + j] = direito->clientes[j];
+                    }
+
 
                     esquerdo->num_chaves += direito->num_chaves + 1;
 
