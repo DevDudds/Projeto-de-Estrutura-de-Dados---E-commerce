@@ -2,9 +2,9 @@
 
 Um sistema de gerenciamento de usuários para uma loja virtual.
 
-    Chave da Árvore: ID do Cliente ou Email.
+    Chave da Árvore: CPF.
 
-    Dados do Nó: Nome, endereço de entrega, telefone e pontos de fidelidade.
+    Dados do Nó: Nome, CPF e Idade.
 
 
 # dividirFilho()

@@ -452,7 +452,7 @@ int main()
             scanf("%d", &cliente.idade);
 
             inserir(&raiz, cliente);
-
+            salvarClientesJSON(raiz, "clientes.json");
             break;
         }
 
@@ -519,8 +519,6 @@ int main()
 
         case 5:
         {
-            salvarClientesJSON(raiz, "clientes.json");
-
             return 0;
         }
 
