@@ -364,13 +364,18 @@ void remover(NoCliente *no, char *cpf) {
                     irmao->num_chaves--;
                     filho->num_chaves++;
                 } else {
-                    NoCliente *esquerdo = no->filhos[i];
-                    NoCliente *direito = no->filhos[i + 1];
+                    /* CORREÇÃO: quando "filho" é o último filho do nó (i == no->num_chaves),
+                       não existe irmão à direita (no->filhos[i + 1] seria acesso fora dos
+                       limites). Nesse caso a fusão precisa ser feita com o irmão à ESQUERDA. */
+                    int indiceFusao = (i < no->num_chaves) ? i : i - 1;
+
+                    NoCliente *esquerdo = no->filhos[indiceFusao];
+                    NoCliente *direito = no->filhos[indiceFusao + 1];
 
                     int antigas = esquerdo->num_chaves;
                     int chaves_direito = direito->num_chaves;
 
-                    esquerdo->clientes[antigas] = no->clientes[i];
+                    esquerdo->clientes[antigas] = no->clientes[indiceFusao];
 
                     for (int j = 0; j < chaves_direito; j++) {
                         esquerdo->clientes[antigas + 1 + j] = direito->clientes[j];
@@ -385,11 +390,11 @@ void remover(NoCliente *no, char *cpf) {
                         }
                     }
 
-                    for (int j = i; j < no->num_chaves - 1; j++) {
+                    for (int j = indiceFusao; j < no->num_chaves - 1; j++) {
                         no->clientes[j] = no->clientes[j + 1];
                     }
                     
-                    for (int j = i + 1; j < no->num_chaves; j++) {
+                    for (int j = indiceFusao + 1; j < no->num_chaves; j++) {
                         no->filhos[j] = no->filhos[j + 1];
                     }
 
@@ -443,7 +448,7 @@ int main()
             printf("\n--- INSERIR CLIENTE ---\n");
 
             printf("Nome: ");
-            scanf(" %[^\n]", cliente.nome);
+            scanf(" %49[^\n]", cliente.nome);
 
             printf("CPF: ");
             scanf("%11s", cliente.cpf);
@@ -464,7 +469,7 @@ int main()
             printf("\n--- BUSCAR CLIENTE POR CPF ---\n");
 
             printf("Digite o CPF do cliente: ");
-            scanf("%s", cpf_digitado);
+            scanf("%14s", cpf_digitado);
 
             NoCliente *no_encontrado = buscarCliente(raiz, cpf_digitado, &indice);
 
@@ -508,7 +513,7 @@ int main()
             printf("\n--- REMOVER CLIENTE ---\n");
 
             printf("Digite o CPF do cliente: ");
-            scanf("%s", cpf_remover);
+            scanf("%14s", cpf_remover);
 
             removerArvore(&raiz, cpf_remover);
 

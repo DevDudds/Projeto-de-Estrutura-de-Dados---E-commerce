@@ -1,12 +1,25 @@
 body {
     background-color: black;
     color: white;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
     align-items: center;
     min-height: 100vh;
     height: auto;
+}
+
+.oto-site {
+    background-color: gray;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    a {
+        text-decoration: none;
+        color: white;
+        font-size: 40px;
+    }
 }
 
 #container {
