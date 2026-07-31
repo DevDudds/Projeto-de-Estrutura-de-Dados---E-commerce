@@ -37,7 +37,7 @@ body {
     p {
         margin: 3px;
     }
-    animation: aparecer 1s;
+    animation: aparecer 500ms;
 }
 
 @keyframes aparecer {

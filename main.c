@@ -512,8 +512,10 @@ int main()
 
             removerArvore(&raiz, cpf_remover);
 
-            printf("\nOperação de remoção concluída.\n");
+            salvarClientesJSON(raiz, "clientes.json");
 
+            printf("\nOperação de remoção concluída.\n");
+            
             break;
         }
 
